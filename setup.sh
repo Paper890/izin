@@ -1,26 +1,20 @@
 #!/bin/bash
 
-# Update package lists
-sudo apt update
+# Step 1: Install Python
+sudo apt-get update
+sudo apt-get install -y python3
 
-# Install Python and pip
-sudo apt install -y python3 python3-pip
-
-# Install required Python libraries
-pip3 install python-telegram-bot PyGithub
-
-# Clone repository
+# Step 2: Clone GitHub Repository
 git clone https://github.com/Paper890/izin.git
 
-# Move to repository directory
+# Step 3: Navigate to Repository Directory
 cd izin
 
-# Install any additional dependencies (if needed)
-# ...
+# Step 4: Install Python Dependencies
+pip install -r requirements.txt
 
-# Run the bot in the background
-nohup python3 bot.py > bot.log 2>&1 &
- 
-chmod +x install_and_run.sh
+# Step 5: Set Environment Variables
+export GITHUB_TOKEN=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
 
-./install_and_run.sh
+# Step 6: Run Python Script
+python bot.py
