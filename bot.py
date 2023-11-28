@@ -20,7 +20,7 @@ def get_repos(update: Update, context: CallbackContext) -> None:
         update.message.reply_text(repo.name)
 
 def add_ip(update: Update, context: CallbackContext) -> None:
-    repo = g.get_user().get_repo('san')
+    repo = g.get_user().get_repo('izin')
     file = repo.get_contents('izin.txt', ref='master')
     data = base64.b64decode(file.content).decode('utf-8') + '\n### ' + ' '.join(context.args)
     repo.update_file(file.path, 'Updated by telegram bot', data, file.sha, branch='master')
