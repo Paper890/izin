@@ -4,13 +4,13 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 import requests
 
 # Token bot Telegram Anda
-TELEGRAM_BOT_TOKEN = '6857385915:AAGHGbdMRMQ1lsAL2Y8n6MOZIMzSicugwQw'
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 
 # ID chat grup atau user di Telegram
-TELEGRAM_CHAT_ID = '576495165'
+TELEGRAM_CHAT_ID = 576495165
 
 # URL untuk mengupload file ke GitHub
-GITHUB_UPLOAD_URL = 'https://api.github.com/Paper890/izin//main/IP'
+GITHUB_UPLOAD_URL = 'https://raw.githubusercontent.com/Paper890/izin/main/IP/IP.txt'
 
 def start(update: Update, context: CallbackContext) -> None:
     update.message.reply_text('Bot is running!')
@@ -44,7 +44,7 @@ def upload_to_github():
     github_file_name = 'IP.txt'
 
     # Membaca token GitHub dari variabel lingkungan
-    github_token = os.environ.get('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')
+    github_token = os.environ.get('GITHUB_TOKEN')
 
     # Membaca isi file
     with open(github_file_name, 'r') as file:
