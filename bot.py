@@ -1,44 +1,96 @@
+import os
 from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
-from github import Github
-import base64
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import requests
 
-# Token dari bot Telegram dan token akses pribadi GitHub
-TELEGRAM_TOKEN = '6857385915:AAGHGbdMRMQ1lsAL2Y8n6MOZIMzSicugwQw'
-GITHUB_TOKEN = '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'
+# Token bot Telegram Anda
+TELEGRAM_BOT_TOKEN = '6857385915:AAGHGbdMRMQ1lsAL2Y8n6MOZIMzSicugwQw'
 
-# Membuat instance Github
-g = Github(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)
+# ID chat grup atau user di Telegram
+TELEGRAM_CHAT_ID = '576495165'
+
+# URL untuk mengupload file ke GitHub
+GITHUB_UPLOAD_URL = 'https://api.github.com/Paper890/izin//main/IP'
 
 def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('WELCOME IP REGIST TO SKYTUNNEL')
+    update.message.reply_text('Bot is running!')
 
-def get_repos(update: Update, context: CallbackContext) -> None:
-    user = g.get_user()
-    repos = user.get_repos()
-    for repo in repos:
-        update.message.reply_text(repo.name)
+def process_text(update: Update, context: CallbackContext) -> None:
+    # Mendapatkan teks dari pesan
+    text = update.message.text
 
-def add_ip(update: Update, context: CallbackContext) -> None:
-    repo = g.get_user().get_repo('izin')
-    file = repo.get_contents('izin.txt', ref='master')
-    data = base64.b64decode(file.content).decode('utf-8') + '\n### ' + ' '.join(context.args)
-    repo.update_file(file.path, 'Updated by telegram bot', data, file.sha, branch='master')
-    update.message.reply_text('IP added successfully!')
+    # Mengekstrak informasi dari teks
+    parts = text.split()
+    username = parts[0].replace('#', '')
+    date = parts[1]
+    ip_address = parts[2]
+    status = parts[3]
 
-def main() -> None:
-    updater = Updater(token=6857385915:AAGHGbdMRMQ1lsAL2Y8n6MOZIMzSicugwQw)
+    # Format teks untuk diisi ke dalam file
+    file_content = f'{username} {date} {ip_address} {status}\n'
 
-    dispatcher = updater.dispatcher
+    # Menyimpan ke file
+    with open('log.txt', 'a') as file:
+        file.write(file_content)
 
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("get_repos", get_repos))
-    dispatcher.add_handler(CommandHandler("add_ip", add_ip))
+    # Mengirim file ke GitHub
+    upload_to_github()
 
+def upload_to_github():
+    # Mengganti nilai-nilai ini sesuai dengan informasi GitHub Anda
+    github_username = 'Paper890'
+    github_repository = 'izin'
+    github_path = 'izin/IP'
+    github_file_name = 'IP.txt'
+
+    # Membaca token GitHub dari variabel lingkungan
+    github_token = os.environ.get('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')
+
+    # Membaca isi file
+    with open(github_file_name, 'r') as file:
+        file_content = file.read()
+
+    # Membuat payload untuk request
+    payload = {
+        'message': 'Update log file',
+        'content': file_content
+    }
+
+    # Menentukan header untuk autentikasi
+    headers = {
+        'Authorization': f'token {github_token}'
+    }
+
+    # Melakukan request untuk mengupdate file di GitHub
+    response = requests.put(
+        GITHUB_UPLOAD_URL.replace('Paper890', github_username)
+                        .replace('izin', github_repository)
+                        .replace('izin/IP', github_path)
+                        .replace('IP.txt', github_file_name),
+        headers=headers,
+        json=payload
+    )
+
+    # Memeriksa status response
+    if response.status_code == 200:
+        print('File successfully uploaded to GitHub')
+    else:
+        print(f'Failed to upload file to GitHub. Status code: {response.status_code}')
+
+def main():
+    updater = Updater(TELEGRAM_BOT_TOKEN)
+
+    # Menambahkan handler untuk command /start
+    updater.dispatcher.add_handler(CommandHandler('start', start))
+
+    # Menambahkan handler untuk mengolah pesan teks
+    updater.dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, process_text))
+
+    # Memulai polling untuk mendapatkan pembaruan dari Telegram
     updater.start_polling()
 
+    # Menjalankan bot hingga disetop manual
     updater.idle()
 
 if __name__ == '__main__':
     main()
- 
