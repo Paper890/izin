@@ -10,10 +10,10 @@ sudo apt install -y python3 python3-pip
 pip3 install python-telegram-bot PyGithub
 
 # Clone repository
-git clone https://github.com/Paper890/san.git
+git clone https://github.com/Paper890/izin.git
 
 # Move to repository directory
-cd your_repository
+cd izin
 
 # Install any additional dependencies (if needed)
 # ...
